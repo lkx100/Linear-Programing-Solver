@@ -6,7 +6,7 @@ from .LP_Algorithms.GraphicalMethod import GraphicalMethod
 def home(request):
     return render(request, 'home.html', {})
 
-def simplex_method(request):
+def transportation_method(request):
     if request.method == 'POST':
         try:
             # Get and validate matrix dimensions
@@ -88,7 +88,7 @@ def simplex_method(request):
         return JsonResponse(response_data)
 
     # For GET requests, render the template
-    return render(request, 'simplex_method.html', {})
+    return render(request, 'transportation_method.html', {})
 
 def graphical_method(request):
     # if request.method == "POST":

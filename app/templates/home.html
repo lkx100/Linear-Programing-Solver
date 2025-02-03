@@ -3,10 +3,37 @@
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-    <h1>Welcome to the Home Page</h1>
+<div class="container my-4">
+    <div class="text-center">
+        <h1>Welcome to the Linear Programming Solver</h1>
+        <p class="lead">This web application demonstrates the Simplex and Graphical Methods for solving linear programming problems.</p>
+    </div>
     <br><hr><br>
-    <p>This is a simple web application that demonstrates the Simplex Method for solving transportation problems.</p>
-    <p>Click the button below to get started.</p>
-    <br>
-    <a href="{% url 'simplex_method' %}" class="btn btn-primary">Simplex Method</a>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card bg-dark text-light mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Transportation Method</h3>
+                </div>
+                <div class="card-body">
+                    <p>The Transportation Method is an algorithm for solving linear programming problems. It is particularly useful for solving large-scale problems with many variables and constraints.</p>
+                    <p>Click the button below to get started with the Simplex Method.</p>
+                    <a href="{% url 'transportation_method' %}" class="btn btn-primary">Transportation Method</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark text-light mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Graphical Method</h3>
+                </div>
+                <div class="card-body">
+                    <p>The Graphical Method is a visual way of solving linear programming problems with two variables. It involves plotting the constraints on a graph and finding the feasible region.</p>
+                    <p>Click the button below to get started with the Graphical Method.</p>
+                    <a href="{% url 'graphical_method' %}" class="btn btn-primary">Graphical Method</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
