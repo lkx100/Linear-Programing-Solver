@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+    <h1>Welcome to the Home Page</h1>
+    <br><hr><br>
+    <p>This is a simple web application that demonstrates the Simplex Method for solving transportation problems.</p>
+    <p>Click the button below to get started.</p>
+    <br>
+    <a href="{% url 'simplex_method' %}" class="btn btn-primary">Simplex Method</a>
+{% endblock %}

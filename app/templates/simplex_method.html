@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Simplex Method Page{% endblock %}
+
+{% block content %}
+<div class="container">
+    <center><h1>Simplex Method Solution</h1></center>
+    <br><hr><br>
+    
+    {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="matrix-controls">
+        <label>Sources: <input type="number" id="rows" min="1" value="3" onchange="validateDimension(this)"></label>
+        <label>Destinations: <input type="number" id="cols" min="1" value="3" onchange="validateDimension(this)"></label>
+        <button onclick="createMatrix()">Create Matrix</button>
+    </div>
+    
+    <form method="POST" id="transportForm">
+        {% csrf_token %}
+        <div id="matrix-container">
+            <h3>Cost Matrix</h3>
+            <div id="cost-matrix"></div>
+            <hr>
+            <h3>Supply</h3>
+            <div id="supply-vector"></div>
+            <hr>
+            <h3>Demand</h3>
+            <div id="demand-vector"></div>
+        </div>
+        <br>
+        <button type="submit">Calculate Solution</button>
+    </form>
+    <hr>
+
+    <div id="result-container">
+        {% if total_cost %}
+            <br><hr><br>
+            <h3>Total Cost: {{total_cost}}</h3>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
