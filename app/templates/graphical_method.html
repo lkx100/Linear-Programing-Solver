@@ -1,92 +1,4 @@
 {% extends "base.html" %}
-{% comment %} 
-{% block title %}Graphical Method LP Solver{% endblock %}
-
-{% block content %}
-<h1>Graphical Method</h1>
-<form id="lpForm" method="POST">
-    {% csrf_token %}
-    <h3>Objective Function</h3>
-    <label>Coefficient for x: <input type="number" step="0.01" name="c1" required></label>
-    <label>Coefficient for y: <input type="number" step="0.01" name="c2" required></label>
-    <br>
-    <label>Problem Type:
-        <select name="problem_type">
-            <option value="max">Maximization</option>
-            <option value="min">Minimization</option>
-        </select>
-    </label>
-    <br><br>
-    <h3>Constraints (of the form: a·x + b·y ≤ limit)</h3>
-    <label>Number of Constraints: 
-        <input type="number" id="constraint_count" name="constraint_count" min="1" value="2" required>
-    </label>
-    <button type="button" onclick="createConstraints()">Create Constraints</button>
-    <div id="constraints-container"></div>
-    <br>
-    <button type="submit">Solve LP</button>
-</form>
-
-<div id="lp-result"></div>
-
-<script>
-    function createConstraints(){
-        const count = parseInt(document.getElementById('constraint_count').value);
-        const container = document.getElementById('constraints-container');
-        let html = '';
-        for(let i = 0; i < count; i++){
-            html += `<div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                        <h4>Constraint ${i+1}</h4>
-                        <label>a: <input type="number" step="0.01" name="constraint_${i}_a" required></label>
-                        <label>b: <input type="number" step="0.01" name="constraint_${i}_b" required></label>
-                        <label>Limit: <input type="number" step="0.01" name="constraint_${i}_limit" required></label>
-                     </div>`;
-        }
-        container.innerHTML = html;
-    }
-    // Create initial constraints on page load
-    createConstraints();
-
-    // Handle AJAX form submission
-    document.getElementById("lpForm").addEventListener("submit", function(e){
-        e.preventDefault();
-        const formData = new FormData(this);
-        fetch("", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const resultDiv = document.getElementById("lp-result");
-            if(data.error){
-                resultDiv.innerHTML = `<div class="error-message">${data.error}</div>`;
-            } else {
-                resultDiv.innerHTML = `<br><hr>
-                                       <h3>Optimal Value: ${data.optimal_value}</h3>
-                                       <p>Solution: x = ${data.solution[0]}, y = ${data.solution[1]}</p>
-                                       <p>Status: ${data.status}</p>`;
-            }
-        })
-        .catch(error => {
-            document.getElementById("lp-result").innerHTML = `<div class="error-message">An error occurred.</div>`;
-        });
-    });
-</script>
-
-<style>
-.error-message {
-    background-color: #ffebee;
-    color: #c62828;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
-    border: 1px solid #ef9a9a;
-}
-</style>
-{% endblock %} {% endcomment %}
 
 {% block title %}Graphical LP Solver{% endblock %}
 
@@ -136,6 +48,8 @@
   </div>
 
   <div id="lp-result" class="mt-4"></div>
+  <!-- Container for the matplotlib graph image -->
+  <div id="graph" class="mt-4"></div>
 </div>
 
 <script>
@@ -180,39 +94,47 @@
     // Create initial constraints on page load
     createConstraints();
 
-  // Handle AJAX form submission
-  document.getElementById("lpForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch("", {
-          method: "POST",
-          body: formData,
-          headers: {
-              "X-Requested-With": "XMLHttpRequest"
-          }
-      })
-      .then(response => response.json())
-      .then(data => {
-          const resultDiv = document.getElementById("lp-result");
-          if(data.error){
-              resultDiv.innerHTML = `<div class="alert alert-danger" role="alert">${data.error}</div>`;
-          } else {
-              resultDiv.innerHTML = `
-                  <div class="card bg-dark text-light">
-                      <div class="card-body">
-                          <h4 class="card-title">Optimal Value: ${data.optimal_value}</h4>
-                          <p class="card-text">
-                            Solution: x = ${data.solution[0]}, y = ${data.solution[1]}<br>
-                            Status: ${data.status}
-                          </p>
-                      </div>
-                  </div>
-              `;
-          }
-      })
-      .catch(error => {
-          document.getElementById("lp-result").innerHTML = `<div class="alert alert-danger" role="alert">An error occurred.</div>`;
-      });
-  });
+    // Handle AJAX form submission
+    document.getElementById("lpForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch("", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultDiv = document.getElementById("lp-result");
+            if(data.error){
+                resultDiv.innerHTML = `<div class="alert alert-danger" role="alert">${data.error}</div>`;
+                document.getElementById("graph").innerHTML = '';
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="card bg-dark text-light">
+                        <div class="card-body">
+                            <h4 class="card-title">Optimal Value: ${data.optimal_value}</h4>
+                            <p class="card-text">
+                              Solution: x = ${data.solution[0]}, y = ${data.solution[1]}<br>
+                              Status: ${data.status}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                if(data.plot){
+                    document.getElementById("graph").innerHTML = `<img class="img-fluid" src="data:image/png;base64,${data.plot}" />`;
+                } else {
+                    document.getElementById("graph").innerHTML = '';
+                }
+            }
+        })
+        .catch(error => {
+            document.getElementById("lp-result").innerHTML = `<div class="alert alert-danger" role="alert">An error occurred.</div>`;
+            document.getElementById("graph").innerHTML = '';
+        });
+    });
 </script>
 {% endblock %}
+

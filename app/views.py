@@ -91,40 +91,13 @@ def transportation_method(request):
     return render(request, 'transportation_method.html', {})
 
 def graphical_method(request):
-    # if request.method == "POST":
-    #     try:
-    #         # Get objective function coefficients and problem type
-    #         c1 = float(request.POST.get("c1"))
-    #         c2 = float(request.POST.get("c2"))
-    #         problem_type = request.POST.get("problem_type", "max")
-    #         # Get and validate constraints count
-    #         constraint_count = int(request.POST.get("constraint_count"))
-    #         if constraint_count <= 0:
-    #             raise ValueError("At least one constraint is required.")
-    #         constraints = []
-    #         for i in range(constraint_count):
-    #             a_val = float(request.POST.get(f"constraint_{i}_a"))
-    #             b_val = float(request.POST.get(f"constraint_{i}_b"))
-    #             limit = float(request.POST.get(f"constraint_{i}_limit"))
-    #             constraints.append({"a": a_val, "b": b_val, "limit": limit})
-    #         solver = GraphicalMethod([c1, c2], constraints, problem_type)
-    #         result = solver.solve()
-    #         response_data = {
-    #             "optimal_value": round(result["optimal_value"], 2),
-    #             "solution": [round(sol, 2) for sol in result["solution"]],
-    #             "status": result["status"],
-    #             "error": None
-    #         }
-    #     except Exception as e:
-    #         response_data = {"error": str(e)}
-    #     return JsonResponse(response_data)
-
-    # return render(request, "graphical_method.html", {})
     if request.method == "POST":
         try:
+            # Get objective function coefficients and problem type
             c1 = float(request.POST.get("c1"))
             c2 = float(request.POST.get("c2"))
             problem_type = request.POST.get("problem_type", "max")
+            # Get and validate constraints count
             constraint_count = int(request.POST.get("constraint_count"))
             if constraint_count <= 0:
                 raise ValueError("At least one constraint is required.")
@@ -133,14 +106,7 @@ def graphical_method(request):
                 a_val = float(request.POST.get(f"constraint_{i}_a"))
                 b_val = float(request.POST.get(f"constraint_{i}_b"))
                 limit = float(request.POST.get(f"constraint_{i}_limit"))
-                inequality = request.POST.get(f"constraint_{i}_inequality", "<=")
-                constraints.append({
-                    "a": a_val,
-                    "b": b_val,
-                    "limit": limit,
-                    "inequality": inequality
-                })
-            from .LP_Algorithms.GraphicalMethod import GraphicalMethod
+                constraints.append({"a": a_val, "b": b_val, "limit": limit})
             solver = GraphicalMethod([c1, c2], constraints, problem_type)
             result = solver.solve()
             response_data = {
@@ -149,11 +115,13 @@ def graphical_method(request):
                 "status": result["status"],
                 "error": None
             }
+            response_data["graph_data"] = solver.get_graph_details()
+            # Pass the optimal solution coordinates to get_plot
+            response_data["plot"] = solver.get_plot(optimal_solution=result["solution"])
         except Exception as e:
             response_data = {"error": str(e)}
         return JsonResponse(response_data)
+
     return render(request, "graphical_method.html", {})
-
-
 
 
