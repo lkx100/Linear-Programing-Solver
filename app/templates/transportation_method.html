@@ -16,7 +16,7 @@
     <div class="matrix-controls">
         <label>Sources: <input type="number" id="rows" min="1" value="3" onchange="validateDimension(this)"></label>
         <label>Destinations: <input type="number" id="cols" min="1" value="3" onchange="validateDimension(this)"></label>
-        <button onclick="createMatrix()">Create Matrix</button>
+        <button class="btn btn-secondary" onclick="createMatrix()">Create Matrix</button>
     </div>
     
     <form method="POST" id="transportForm">
@@ -32,7 +32,7 @@
             <div id="demand-vector"></div>
         </div>
         <br>
-        <button type="submit">Calculate Solution</button>
+        <button class="btn btn-primary" type="submit">Calculate Solution</button>
     </form>
     <hr>
 

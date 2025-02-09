@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Simplex Method LP Solver{% endblock %}
+
+{% block content %}
+<div class="container my-3"> <!-- Reduced margin from my-4 to my-3 -->
+  <div class="card bg-dark text-light mb-3"> <!-- Reduced margin from mb-4 to mb-3 -->
+    <div class="card-header">
+      <center><h2 class="card-title mb-0">Simplex Method LP Solver</h2></center>
+      <br>
+    </div>
+    <div class="card-body">
+      <form id="simplexForm" method="POST">
+        {% csrf_token %}
+        <div class="row mb-3">
+          <div class="col">
+            <label>Number of Variables:</label>
+            <input type="number" id="num_vars" name="num_vars" min="1" value="2" class="form-control" required>
+          </div>
+          <div class="col">
+            <label>Number of Constraints:</label>
+            <input type="number" id="num_constraints" name="num_constraints" min="1" value="2" class="form-control" required>
+          </div>
+          <div class="col-auto align-self-end">
+            <button type="button" class="btn btn-secondary" onclick="generateFields()">Generate Fields</button>
+          </div>
+        </div>
+        <div class="col">
+          <label>Problem Type:</label> 
+          <br>
+          <select name="problem_type" class="form-select">
+            <option value="max">Maximize</option>
+            <option value="min">Minimize</option>
+          </select>
+        </div>
+        <br>
+        <div id="objective_fields" class="mb-3">
+          <!-- Objective coefficients will be generated here -->
+        </div>
+        <div id="constraints_fields" class="mb-3">
+          <!-- Constraint coefficient fields will be generated here -->
+        </div>
+        <button type="submit" class="btn btn-primary">Solve LP</button>
+      </form>
+    </div>
+  </div>
+  <div id="simplex-result"></div>
+</div>
+
+<script>
+function generateFields(){
+    const numVars = parseInt(document.getElementById('num_vars').value);
+    const numConstraints = parseInt(document.getElementById('num_constraints').value);
+    const objContainer = document.getElementById('objective_fields');
+    const constrContainer = document.getElementById('constraints_fields');
+    let objHtml = '<h5>Objective Function Coefficients (c):</h5><div class="row">';
+    for(let i=0; i<numVars; i++){
+        objHtml += `<div class="col">
+                      <input type="number" step="0.01" name="obj_${i}" placeholder="c${i+1}" class="form-control" required>
+                    </div>`;
+    }
+    objHtml += '</div>';
+    objContainer.innerHTML = objHtml;
+
+    let constrHtml = '<h5>Constraints (A·x ≤ b):</h5>';
+    for(let i=0; i<numConstraints; i++){
+        constrHtml += `<div class="card mb-2">
+                          <div class="card-body">
+                            <h6>Constraint ${i+1}</h6>
+                            <div class="row">`;
+        for(let j=0; j<numVars; j++){
+            constrHtml += `<div class="col">
+                             <input type="number" step="0.01" name="constr_${i}_coef_${j}" placeholder="a${i+1}${j+1}" class="form-control" required>
+                           </div>`;
+        }
+        constrHtml += `<div class="col-auto">
+                         <input type="number" step="0.01" name="constr_${i}_rhs" placeholder="b${i+1}" class="form-control" required>
+                        </div>`;
+        constrHtml += `   </div>
+                          </div>
+                        </div>`;
+    }
+    constrContainer.innerHTML = constrHtml;
+}
+// Generate fields on page load
+generateFields();
+
+document.getElementById("simplexForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetch("", {
+        method: "POST",
+        body: formData,
+        headers: {"X-Requested-With": "XMLHttpRequest"}
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById("simplex-result");
+        if(data.error){
+            resultDiv.innerHTML = `
+              <div class="alert alert-danger" role="alert">
+                ${data.error}
+              </div>`;
+        } else {
+            resultDiv.innerHTML = `
+              <div class="alert alert-dark text-light" role="alert">
+                <h5>Optimal Value: ${data.optimal_value}</h5>
+                <p>Solution: [${data.solution.join(", ")}]</p>
+              </div>`;
+        }
+    })
+    .catch(err => {
+        document.getElementById("simplex-result").innerHTML = `<div class="alert alert-danger">An error occurred.</div>`;
+    });
+});
+</script>
+{% endblock %}

@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .LP_Algorithms.Transportation import SimplexMethod
 from .LP_Algorithms.GraphicalMethod import GraphicalMethod
+from .LP_Algorithms.SimplexMethod import SimplexSolver
+import numpy as np
 
 def home(request):
     return render(request, 'home.html', {})
@@ -125,3 +127,31 @@ def graphical_method(request):
     return render(request, "graphical_method.html", {})
 
 
+def simplex_method(request):
+    if request.method == "POST":
+        try:
+            num_vars = int(request.POST.get("num_vars"))
+            num_constraints = int(request.POST.get("num_constraints"))
+            # Read objective coefficients
+            c = [float(request.POST.get(f"obj_{i}")) for i in range(num_vars)]
+            A = []
+            b = []
+            for i in range(num_constraints):
+                # For each constraint, read coefficients for each variable
+                row = [float(request.POST.get(f"constr_{i}_coef_{j}")) for j in range(num_vars)]
+                A.append(row)
+                b.append(float(request.POST.get(f"constr_{i}_rhs")))
+            problem_type = request.POST.get("problem_type", "max").lower()
+            if problem_type == "min":
+                c = [-x for x in c]
+            solver = SimplexSolver(np.array(c), np.array(A), np.array(b))
+            solution, optimal_value = solver.solve()
+            response_data = {
+                "solution": [round(x, 2) for x in solution],
+                "optimal_value": round(optimal_value, 2),
+                "error": None
+            }
+        except Exception as e:
+            response_data = {"error": str(e)}
+        return JsonResponse(response_data)
+    return render(request, "simplex_method.html", {})
