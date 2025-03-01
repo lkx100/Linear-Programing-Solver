@@ -13,12 +13,12 @@
         <div class="col-md-6">
             <div class="card bg-dark text-light mb-4">
                 <div class="card-header">
-                    <h3 class="card-title">Transportation Method</h3>
+                    <h3 class="card-title">Simplex Method</h3>
                 </div>
                 <div class="card-body">
-                    <p>The Transportation Method is an algorithm for solving linear programming problems. It is particularly useful for solving large-scale problems with many variables and constraints.</p>
+                    <p>The Simplex Method is an algorithm for solving linear programming problems. It is particularly useful for solving problems with many variables and constraints.</p>
                     <p>Click the button below to get started with the Simplex Method.</p>
-                    <a href="{% url 'transportation_method' %}" class="btn btn-primary">Transportation Method</a>
+                    <a href="{% url 'simplex_method' %}" class="btn btn-primary">Simplex Method</a>
                 </div>
             </div>
         </div>
@@ -31,6 +31,32 @@
                     <p>The Graphical Method is a visual way of solving linear programming problems with two variables. It involves plotting the constraints on a graph and finding the feasible region.</p>
                     <p>Click the button below to get started with the Graphical Method.</p>
                     <a href="{% url 'graphical_method' %}" class="btn btn-primary">Graphical Method</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card bg-dark text-light mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Transportation Method</h3>
+                </div>
+                <div class="card-body">
+                    <p>The Transportation Method is an algorithm for solving linear programming problems. It is particularly useful for solving large-scale problems with many variables and constraints.</p>
+                    <p>Click the button below to get started with the Simplex Method.</p>
+                    <a href="{% url 'transportation_method' %}" class="btn btn-primary">Transportation Method</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-dark text-light mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">Time Table Generator</h3>
+                </div>
+                <div class="card-body">
+                    <p>The Time Table Generator is a tool for creating optimized timetables for schools and universities. It uses linear programming techniques to generate schedules that meet various constraints.</p>
+                    <p>Click the button below to get started with the Time Table Generator.</p>
+                    <a href="{% url 'generate' %}" class="btn btn-primary">Time Table Generator</a>
                 </div>
             </div>
         </div>

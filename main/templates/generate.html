@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}
+Generate
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-center">
+            <h1>Time Table Generator</h1>
+        </div>
+        <div class="card-body">
+
+            <form method="post" action="{% url 'generate_timetable' %}">
+                {% csrf_token %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6 border-end">
+                        <label for="sections">Classes:</label>
+                        <div id="sections">
+                            <div class="input-group mb-2">
+                                <select class="form-control" name="section_name" required>
+                                    {% for section in sections %}
+                                        <option value="{{ section.name }}">{{ section.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button style='margin-top: 10px' type="button" class="btn btn-light" onclick="addSection()">Add Class</button>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="courses">Course-Section Mapping:</label>
+                        <div id="courses">
+                            <div class="input-group mb-2">
+                                <select class="form-control" name="course_name" required>
+                                    {% for course in courses %}
+                                        <option value="{{ course.name }}">{{ course.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select class="form-control" name="course_section" required>
+                                    {% for section in sections %}
+                                        <option value="{{ section.name }}">{{ section.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button style='margin-top: 10px' type="button" class="btn btn-light" onclick="addCourse()">Add Course</button>
+                    </div>
+                </div>
+        
+                <hr class="my-4" style='border-width: 5px'> <!-- Separator -->
+        
+                <div class="row mb-3">
+                    <div class="col-md-6 border-end">
+                        <label for="professors">Course - Professor:</label>
+                        <div id="professors">
+                            <div class="input-group mb-2">
+                                <select class="form-control" name="professor_course" required>
+                                    {% for course in courses %}
+                                        <option value="{{ course.name }}">{{ course.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select class="form-control" name="professor_name" required>
+                                    {% for professor in professors %}
+                                        <option value="{{ professor.name }}">{{ professor.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button style='margin-top: 10px' type="button" class="btn btn-light" onclick="addProfessor()">Add Professor</button>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="days">Weekdays:</label>
+                        <div id="days">
+                            <div class="input-group mb-2">
+                                <select class="form-control" name="day_name" required>
+                                    {% for day in days %}
+                                        <option value="{{ day.name }}">{{ day.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button style='margin-top: 10px' type="button" class="btn btn-light" onclick="addDay()">Add Day</button>
+                    </div>
+                </div>
+        
+                <hr class="my-4" style='border-width: 5px'> <!-- Separator -->
+        
+                <div class="row mb-3">
+                    <div class="col-md-6 border-end">
+                        <label for="time_slots">Time Slots:</label>
+                        <div id="time_slots">
+                            <div class="input-group mb-2">
+                                <select class="form-control" name="time_slot" required>
+                                    {% for slot in time_slots %}
+                                        <option value="{{ slot.name}}">{{ slot.name }}</option>
+                                    {% endfor %}
+                                </select>                    
+                            </div>
+                        </div>
+                        <button style='margin-top: 10px' type="button" class="btn btn-light" onclick="addTimeSlot()">Add Time Slot</button>
+                    </div>
+                </div>
+        
+                <button type="submit" class="btn btn-primary">Generate Timetable</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if timetable %}
+    <hr style='width:100%; border-width: 5px; border-color: white;border-style:dashed;' class="my-[20px]">
+    <h1 class="text-center">Generated Timetable</h1>
+    {% for section, days in timetable.items %}
+    <div style='margin: 0 50px;'>
+        <h2 class="mt-4">Class {{ section }}</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Day</th>
+                    {% for time_slot in time_slots %}
+                        <th>{{ time_slot }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for day, slots in days.items %}
+                    <tr>
+                        <th>{{ day }}</th>
+                        {% for slot, course in slots.items %}
+                            <td>{{ course }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+    <div style='margin: 0 50px;'>
+        <hr style="border-width: 2px">
+        <h5>Subject-Professor Mapping</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject</th>
+                    <th>Professor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject, professor in professors.items %}
+                <tr>
+                    <td>{{ subject }}</td>
+                    <td>{{ professor }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr style='width:100%; border-width: 5px; border-color: white;border-style:dashed;' class="my-[20px]">
+{% endif %}
+
+<script>
+function addSection() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<select class="form-control" name="section_name" required>{% for section in sections %}<option value="{{ section.name }}">{{ section.name }}</option>{% endfor %}</select>';
+    document.getElementById('sections').appendChild(div);
+}
+function addCourse() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<select class="form-control" name="course_name" required>{% for course in courses %}<option value="{{ course.name }}">{{ course.name }}</option>{% endfor %}</select><select class="form-control" name="course_section" required>{% for section in sections %}<option value="{{ section.name }}">{{ section.name }}</option>{% endfor %}</select>';
+    document.getElementById('courses').appendChild(div);
+}
+function addProfessor() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<select class="form-control" name="professor_course" required>{% for course in courses %}<option value="{{ course.name }}">{{ course.name }}</option>{% endfor %}</select><select class="form-control" name="professor_name" required>{% for professor in professors %}<option value="{{ professor.name }}">{{ professor.name }}</option>{% endfor %}</select>';
+    document.getElementById('professors').appendChild(div);
+}
+function addTimeRequirement() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<input type="text" class="form-control" name="time_course" placeholder="Course" required> <input type="number" class="form-control" name="time_requirement" placeholder="Time Requirement" required>';
+    document.getElementById('course_time_requirements').appendChild(div);
+}
+function addDay() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<select class="form-control" name="day_name" required>{% for day in days %}<option value="{{ day.name }}">{{ day.name }}</option>{% endfor %}</select>';
+    document.getElementById('days').appendChild(div);
+}
+function addTimeSlot() {
+    var div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = '<select class="form-control" name="time_slot" required>{% for slot in time_slots %}<option value="{{ slot.name}}">{{ slot.name }}</option>{% endfor %}</select>   ';
+    document.getElementById('time_slots').appendChild(div);
+}
+</script>
+{% endblock %}
