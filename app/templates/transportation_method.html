@@ -1,46 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}Transpotation Method Page{% endblock %}
+{% block title %}Transportation Method Page{% endblock %}
 
 {% block content %}
-<div class="container">
-    <center><h1>Transportation Method Solution</h1></center>
-    <br><hr><br>
-    
-    {% if error %}
-        <div class="error-message">
-            {{ error }}
+<div class="container my-4">
+    <div class="card bg-dark text-light">
+        <div class="card-header">
+            <center><h2 class="card-title mb-0">Transportation Method Solution</h2></center>
+            <br>
         </div>
-    {% endif %}
+        <div class="card-body">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
 
-    <div class="matrix-controls">
-        <label>Sources: <input type="number" id="rows" min="1" value="3" onchange="validateDimension(this)"></label>
-        <label>Destinations: <input type="number" id="cols" min="1" value="3" onchange="validateDimension(this)"></label>
-        <button class="btn btn-secondary" onclick="createMatrix()">Create Matrix</button>
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Number of Sources:</label>
+                    <input type="number" id="cols" min="1" value="3" class="form-control" onchange="createMatrix()">
+                </div>
+                <div class="col">
+                    <label class="form-label">Number of Destinations:</label>
+                    <input type="number" id="rows" min="1" value="3" class="form-control" onchange="createMatrix()">
+                </div>
+                <div class="col-auto align-self-end">
+                    <button class="btn btn-secondary" onclick="createMatrix()">Create Matrix</button>
+                </div>
+            </div>
+
+            <form method="POST" id="transportForm">
+                {% csrf_token %}
+                <div id="matrix-container">
+                    <h4>Cost Matrix</h4>
+                    <div id="cost-matrix"></div>
+                    <hr>
+                    <h4>Demand</h4>
+                    <div id="supply-vector"></div>
+                    <hr>
+                    <h4>Supply</h4>
+                    <div id="demand-vector"></div>
+                </div>
+                <br>
+                <button class="btn btn-primary" type="submit">Calculate Solution</button>
+            </form>
+        </div>
     </div>
-    
-    <form method="POST" id="transportForm">
-        {% csrf_token %}
-        <div id="matrix-container">
-            <h3>Cost Matrix</h3>
-            <div id="cost-matrix"></div>
-            <hr>
-            <h3>Supply</h3>
-            <div id="supply-vector"></div>
-            <hr>
-            <h3>Demand</h3>
-            <div id="demand-vector"></div>
-        </div>
-        <br>
-        <button class="btn btn-primary" type="submit">Calculate Solution</button>
-    </form>
-    <hr>
 
-    <div id="result-container">
+    <div id="result-container" class="mt-4">
         {% if total_cost %}
-            <br><hr><br>
-            <h3>Total Cost: {{total_cost}}</h3>
+            <div class="alert alert-dark text-light" role="alert">
+                <h5>Total Cost: {{ total_cost }}</h5>
+                {% comment %} <p>Solution: {{ solution }}</p> {% endcomment %}
+            </div>
         {% endif %}
     </div>
 </div>
+
+<script>
+    function createMatrix() {
+        const rows = parseInt(document.getElementById('rows').value);
+        const cols = parseInt(document.getElementById('cols').value);
+        const costMatrixContainer = document.getElementById('cost-matrix');
+        const supplyVectorContainer = document.getElementById('supply-vector');
+        const demandVectorContainer = document.getElementById('demand-vector');
+    
+        let costMatrixHtml = '<div class="row">';
+        for (let i = 0; i < rows; i++) {
+            costMatrixHtml += '<div class="col">';
+            for (let j = 0; j < cols; j++) {
+                costMatrixHtml += `<input type="number" step="0.01" name="cost_${i}_${j}" placeholder="c${i+1}${j+1}" class="form-control mb-2" required>`;
+            }
+            costMatrixHtml += '</div>';
+        }
+        costMatrixHtml += '</div>';
+        costMatrixContainer.innerHTML = costMatrixHtml;
+    
+        let supplyHtml = '<div class="row">';
+        for (let i = 0; i < rows; i++) {
+            supplyHtml += `<div class="col">
+                             <input type="number" step="0.01" name="supply_${i}" placeholder="Demand ${i+1}" class="form-control mb-2" required>
+                           </div>`;
+        }
+        supplyHtml += '</div>';
+        supplyVectorContainer.innerHTML = supplyHtml;
+    
+        let demandHtml = '<div class="row">';
+        for (let j = 0; j < cols; j++) {
+            demandHtml += `<div class="col">
+                             <input type="number" step="0.01" name="demand_${j}" placeholder="Supply ${j+1}" class="form-control mb-2" required>
+                           </div>`;
+        }
+        demandHtml += '</div>';
+        demandVectorContainer.innerHTML = demandHtml;
+    
+        // Add hidden inputs for matrix dimensions
+        const matrixContainer = document.getElementById('matrix-container');
+        matrixContainer.innerHTML += `<input type="hidden" name="matrix_rows" value="${rows}">`;
+        matrixContainer.innerHTML += `<input type="hidden" name="matrix_cols" value="${cols}">`;
+    }
+    
+    // Create initial matrix on page load
+    createMatrix();
+    
+    document.getElementById("transportForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch("", {
+            method: "POST",
+            body: formData,
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultContainer = document.getElementById("result-container");
+            if (data.error) {
+                resultContainer.innerHTML = `<div class="alert alert-danger" role="alert">${data.error}</div>`;
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="alert alert-dark text-light" role="alert">
+                        <h5>Total Cost: ${data.total_cost}</h5>
+                    </div>`;
+            }
+        })
+        .catch(error => {
+            document.getElementById("result-container").innerHTML = `<div class="alert alert-danger" role="alert">An error occurred.</div>`;
+        });
+    });
+</script>
 {% endblock %}
