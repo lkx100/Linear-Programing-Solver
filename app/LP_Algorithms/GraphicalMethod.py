@@ -111,6 +111,8 @@ class GraphicalMethod:
         # Get graph details from existing method
         graph_data = self.get_graph_details()
         fig, ax = plt.subplots()
+        fig.patch.set_facecolor('lightgrey')  # Set the background color of the figure
+        ax.set_facecolor('lightgrey')  # Set the background color of the axes
         # Plot each constraint line
         for idx, constraint in enumerate(graph_data["constraints"]):
             ax.plot(constraint["x"], constraint["y"], label=f"Constraint {idx+1}")
