@@ -1,0 +1,72 @@
+/* General container styling */
+.container {
+    width: auto; /* Allow the width to adjust based on content */
+    max-width: 100%; /* Ensure it doesn't exceed the viewport width */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #343a40; /* Dark background color */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #f8f9fa; /* Light text color */
+    overflow: auto; /* Ensure content doesn't overflow */
+}
+
+/* Matrix controls styling */
+.matrix-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.matrix-controls label {
+    margin-right: 15px;
+    color: #f8f9fa; /* Light text color */
+}
+
+/* Table styling */
+table {
+    margin: 10px 0;
+    width: 100%;
+    border-collapse: collapse;
+    color: #f8f9fa; /* Light text color */
+}
+
+td {
+    padding: 5px;
+    border: 1px solid #495057; /* Dark border color */
+}
+
+input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #6c757d; /* Dark border color */
+    border-radius: 4px;
+    background-color: #495057; /* Dark background color */
+    color: #f8f9fa; /* Light text color */
+}
+
+/* Error message styling */
+.error-message {
+    background-color: #dc3545; /* Bootstrap danger color */
+    color: #f8f9fa; /* Light text color */
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #c82333; /* Darker danger color */
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
