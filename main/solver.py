@@ -1,3 +1,4 @@
+import pulp as pl
 from pulp import LpMaximize, LpProblem, LpVariable, lpSum
 import pandas as pd
 
@@ -11,6 +12,7 @@ class TimetableSolver:
         self.time_slots = time_slots
         self.model = LpProblem("Timetable_Scheduling", LpMaximize)
         self.x = LpVariable.dicts("x", [(c, d, t, s) for s in sections for c in courses[s] for d in days for t in time_slots], cat='Binary')
+        self.solver = pl.PULP_CBC_CMD(msg=True)
 
     def define_objective(self):
         self.model += lpSum(self.x[c, d, t, s] for s in self.sections for c in self.courses[s] for d in self.days for t in self.time_slots)
@@ -34,7 +36,7 @@ class TimetableSolver:
                     self.model += lpSum(self.x[c, d, t, s] for c in self.courses[s]) <= 1
 
     def solve(self):
-        self.model.solve()
+        self.model.solve(self.solver)
 
     def print_solution(self):
         print("\nOptimal Weekly Timetable:")
