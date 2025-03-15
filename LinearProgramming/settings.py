@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-m!)%pl5ziv=0x-*g47si4$u2(z58ltou1_ww-q6qdz=rcfgdfd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", "https://linear-programing-solver-production.up.railway.app"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -51,6 +51,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://linear-programing-solver-production.up.railway.app',
 ]
 
 ROOT_URLCONF = 'LinearProgramming.urls'
